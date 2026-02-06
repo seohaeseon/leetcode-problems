@@ -1,0 +1,41 @@
+class TimeLimitedCache {
+    obj: {
+        [key: number]: {
+            value: number;
+        }
+    }
+    static timeoutId: ReturnType<typeof setTimeout>;
+
+    constructor() {
+        this.obj = {};
+    }
+    
+    set(key: number, value: number, duration: number): boolean {
+        if (TimeLimitedCache.timeoutId) clearTimeout(TimeLimitedCache.timeoutId);
+
+        const alreadyExists = (this.obj[key]) ? true : false;
+
+        this.obj[key] = {value};
+
+        TimeLimitedCache.timeoutId = setTimeout(() => {
+            delete this.obj[key];
+        }, duration);
+
+        return alreadyExists;
+    }
+    
+    get(key: number): number {
+        return this.obj[key]?.value ?? -1;
+    }
+    
+    count(): number {
+        return Object.keys(this.obj).length;
+    }
+}
+
+/**
+ * const timeLimitedCache = new TimeLimitedCache()
+ * timeLimitedCache.set(1, 42, 1000); // false
+ * timeLimitedCache.get(1) // 42
+ * timeLimitedCache.count() // 1
+ */
