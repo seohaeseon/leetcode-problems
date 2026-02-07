@@ -2,24 +2,21 @@ class TimeLimitedCache {
     obj: {
         [key: number]: {
             value: number;
+            timeoutId: ReturnType<typeof setTimeout>;
         }
     }
-    static timeoutId: ReturnType<typeof setTimeout>;
 
     constructor() {
         this.obj = {};
     }
     
     set(key: number, value: number, duration: number): boolean {
-        if (TimeLimitedCache.timeoutId) clearTimeout(TimeLimitedCache.timeoutId);
 
         const alreadyExists = (this.obj[key]) ? true : false;
 
-        this.obj[key] = {value};
-
-        TimeLimitedCache.timeoutId = setTimeout(() => {
+        this.obj[key] = {value, timeoutId: setTimeout(() => {
             delete this.obj[key];
-        }, duration);
+        }, duration)};
 
         return alreadyExists;
     }
